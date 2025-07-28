@@ -1,0 +1,57 @@
+server {
+  listen 80;
+  server_name qb.bomber.gg;
+
+  # Redirect all HTTP requests to HTTPS
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  server_name chat.bomber.gg;
+
+  ssl_certificate /etc/letsencrypt/live/bomber.gg/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/bomber.gg/privkey.pem;
+  include /etc/letsencrypt/options-ssl-nginx.conf;
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+  # Chat API with streaming support
+  location /api/chat {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    
+    # Critical for streaming to work
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 300s;
+    proxy_read_timeout 300s;
+    
+    # Important for Server-Sent Events
+    proxy_set_header Cache-Control 'no-cache';
+    proxy_set_header X-Accel-Buffering 'no';
+  }
+
+  # All other routes (default behavior)
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    
+    # Standard timeouts for regular requests
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+  }
+}

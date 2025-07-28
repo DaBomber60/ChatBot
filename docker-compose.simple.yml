@@ -1,0 +1,23 @@
+services:
+  homechatbot:
+    image: ghcr.io/yourusername/homechatbot:latest
+    container_name: homechatbot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/prod.db
+      - JWT_SECRET=${JWT_SECRET:-}
+      - PORT=${PORT:-3000}
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - homechatbot_data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  homechatbot_data:
+    driver: local
