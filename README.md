@@ -1,5 +1,6 @@
 # 🤖 HomeChatBot
 
+
 A powerful, modern web application for creating and chatting with AI characters using customizable personas. Build immersive conversations with detailed AI personalities, complete with message variants, editing capabilities, and a beautiful responsive interface.
 
 ![HomeChatBot](https://via.placeholder.com/800x400/7c3aed/ffffff?text=HomeChatBot+%7C+AI+Character+Chat+Platform)
